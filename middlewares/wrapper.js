@@ -11,10 +11,10 @@ const {
 const { STAGE } = process.env;
 
 module.exports = func => middy(func)
-  .use(cors({
-    origin: '*',
-    credentials: true,
-  }))
+  // .use(cors({
+  //   origin: '*',
+  //   credentials: true,
+  // }))
   .use(ssm({
     cache: true,
     cacheExpiryInMillis: 3 * 60 * 1000,
