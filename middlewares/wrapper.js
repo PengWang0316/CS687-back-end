@@ -26,7 +26,6 @@ module.exports = func => middy(func)
       FUNCTION_SHIELD_TOKEN: `/cs687/${STAGE}/function_shield_token`,
     },
   }))
-  .use(sampleLogging())
   .use(functionShield({
     policy: {
       outbound_connectivity: 'alert',
