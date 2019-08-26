@@ -13,14 +13,6 @@
   },
   "author": "Kevin W.",
   "license": "MIT",
-  "jest": {
-    "testEnvironment": "node",
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "__tests__/helpers/",
-      "__tests__/debug_events/"
-    ]
-  },
   "dependencies": {
     "@kevinwang0316/redis-helper": "^1.0.1",
     "redis": "^2.8.0"
