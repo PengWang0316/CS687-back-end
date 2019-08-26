@@ -51,7 +51,7 @@ package:
     - Information.txt
 
 functions:
-  fetch-hexagrams:
+  fetch-dict:
     handler: functions/fetch-dict.handler
     events:
       - http:
