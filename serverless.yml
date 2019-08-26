@@ -1,0 +1,65 @@
+service: CS687
+
+plugins:
+  - serverless-pseudo-parameters # Read the region and accout id
+  - serverless-iam-roles-per-function # Set up IAM role for each function
+  - serverless-plugin-tracing # Integrate the X-Ray
+  - serverless-plugin-aws-alerts # Automatically generate alerts (Could be used for stopping and rolling back a canary deployment)
+
+custom: # stage and logLevel for log function
+  stage: ${opt:stage, self:provider.stage} # use stage or get if from the provider.stage. The second paramter is default
+  logLevel:
+    prod: WARN
+    default: DEBUG
+  serverless-iam-roles-per-function:
+    defaultInherit: true # All function will inherit from the provider's IAM role.
+  
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  region: us-west-2
+  tracing: true # Use the serverless-plugin-tracing plugin to enable the X-Ray
+  environment:
+    log_level: ${self:custom.logLevel.${self:custom.stage}, self:custom.logLevel.default} # The variable for the log function
+    STAGE: ${self:custom.stage} # For DEFAULT_CONTEXT in log.js
+    FUNCTION_SHIELD_TOKEN: ${ssm:/kairoscope/${self:custom.stage}/function_shield_token} # For using the Function Shield
+  iamRoleStatements:
+    - Effect: Allow
+      Action: cloudwatch:PutMetricData
+      Resource: '*'
+    - Effect: Allow # Give the permission to operate the X-Ray 
+      Action: 
+        - xray:PutTraceSegments
+        - xray:PutTelemetryRecords
+      Resource: '*'
+    # Give the function permission to read paramters from the EC2 Parameter Store
+    - Effect: Allow
+      Action: ssm:GetParameters*
+      Resource: arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/cs687/${self:custom.stage}/*
+    
+    #  # Give the function permission to use layers (Do not really need it)
+    # - Effect: Allow
+    #   Action: lambda:GetLayerVersion
+    #   Resource: '*'
+
+package:
+  exclude:
+    - coverage/**
+    - __tests__/**
+    - build*
+    - Information.txt
+
+functions:
+  fetch-hexagrams:
+    handler: functions/fetch-dict.handler
+    events:
+      - http:
+          path: /dict
+          method: get
+          cors: true
+    memorySize: 256
+    environment:
+      async_metrics: true # Use this variable to control whether send the metrics to CloudWatch Async
+    layers:
+      - ${cf:lambda-layers-dev.KairoscopeDependenciesLayerExport}
