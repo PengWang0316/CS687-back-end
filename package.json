@@ -38,7 +38,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-react": "^7.12.4",
     "middy": "^0.20.5",
-    "serverless": "^1.39.1",
+    "serverless": "^1.83.3",
     "serverless-iam-roles-per-function": "^1.0.4",
     "serverless-plugin-aws-alerts": "^1.2.4",
     "serverless-plugin-tracing": "^2.0.0",
